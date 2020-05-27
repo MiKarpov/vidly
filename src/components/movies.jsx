@@ -8,14 +8,16 @@ import { getGenres } from "../services/fakeGenreService";
 
 class Movies extends Component {
   state = {
-    movies: [],
     genres: [],
+    movies: [],
     pageSize: 4,
     currentPage: 1,
+    selectedGenre: null,
   };
 
   componentDidMount() {
-    this.setState({ movies: getMovies(), genres: getGenres() });
+    const genres = [{ name: "All Genres", _id: 0 }, ...getGenres()];
+    this.setState({ movies: getMovies(), genres });
   }
 
   render() {
@@ -24,16 +26,31 @@ class Movies extends Component {
 
     const currentPage = this.state.currentPage;
     const pageSize = this.state.pageSize;
-    const moviesPage = paginate(this.state.movies, currentPage, pageSize);
     const genres = this.state.genres;
+    const selectedGenre = this.state.selectedGenre;
+
+    const filteredMovies =
+      selectedGenre && selectedGenre._id !== 0
+        ? this.state.movies.filter((m) => m.genre._id === selectedGenre._id)
+        : this.state.movies;
+    const moviesPage = paginate(filteredMovies, currentPage, pageSize);
+    const totalMoviesFiltered = filteredMovies.length;
 
     return (
       <div className="row">
-        <div className="col-2">
-          <GroupList items={genres} onItemSelect={this.handleGenreSelect} />
+        <div className="col-3">
+          <GroupList
+            items={genres}
+            textProperty="name"
+            valueProperty="_id"
+            selectedItem={this.state.selectedGenre}
+            onItemSelect={this.handleGenreSelect}
+          />
         </div>
         <div className="col">
-          <p>Showing {totalMovies} movies</p>
+          <p>
+            Showing {totalMoviesFiltered} of {totalMovies} movies
+          </p>
           <table className="table">
             <thead>
               <tr>
@@ -67,7 +84,7 @@ class Movies extends Component {
             </tbody>
           </table>
           <Pagination
-            totalItems={totalMovies}
+            totalItems={totalMoviesFiltered}
             pageSize={pageSize}
             currentPage={currentPage}
             onPageChange={this.handlePageChange}
@@ -93,7 +110,10 @@ class Movies extends Component {
     this.setState({ currentPage: page });
   };
 
-  handleGenreSelect = () => {};
+  handleGenreSelect = (genre) => {
+    console.log("Selected genre", genre);
+    this.setState({ selectedGenre: genre, currentPage: 1 });
+  };
 }
 
 export default Movies;
