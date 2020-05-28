@@ -1,14 +1,14 @@
 import React from "react";
 import Input from "./common/input";
 
-class Login extends React.Component {
+class LoginForm extends React.Component {
   state = {
     account: { username: "", password: "" },
+    errors: {},
   };
 
   render() {
-    // const { account } = this.state;
-
+    const { account, errors } = this.state;
     return (
       <div>
         <h1>Login</h1>
@@ -16,15 +16,17 @@ class Login extends React.Component {
           <Input
             type="text"
             name="username"
-            value={this.state.account.username}
+            value={account.username}
             label="Username"
+            errorMsg={errors.username}
             onChange={this.handleChange}
           />
           <Input
             type="password"
             name="password"
-            value={this.state.account.password}
+            value={account.password}
             label="Password"
+            errorMsg={errors.password}
             onChange={this.handleChange}
           />
           <button className="btn btn-primary">Login</button>
@@ -41,8 +43,30 @@ class Login extends React.Component {
 
   handleLogin = (e) => {
     e.preventDefault();
-    console.log("Credentials submitted");
+
+    const errors = this.validate();
+    if (errors) {
+      this.setState({ errors });
+      return;
+    }
+
+    console.log("Login and password submitted");
+  };
+
+  validate = () => {
+    const errors = {};
+    const { account } = this.state;
+
+    if (account.username.trim() === "") errors.username = "Username is required.";
+    if (account.password.trim() === "") errors.password = "Password is required.";
+
+    if (Object.keys(errors).length === 0) {
+      return null;
+    } else {
+      console.log("Errors", errors);
+      return errors;
+    }
   };
 }
 
-export default Login;
+export default LoginForm;
