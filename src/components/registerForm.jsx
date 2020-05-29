@@ -1,7 +1,7 @@
 import React, { Component } from "react";
 import { Form, Button } from "react-bootstrap";
 
-class LoginForm extends Component {
+class RegisterForm extends Component {
   constructor(props) {
     super(props);
     this.state = {
@@ -13,8 +13,8 @@ class LoginForm extends Component {
   render() {
     return (
       <React.Fragment>
-        <h1>Login</h1>
-        <Form onSubmit={this.handleSubmit}>
+        <h1>Register</h1>
+        <Form onSubmit={this.handleRegister}>
           <Form.Group controlId="username">
             <Form.Label>Username</Form.Label>
             <Form.Control
@@ -52,7 +52,7 @@ class LoginForm extends Component {
     this.setState({ account });
   };
 
-  handleSubmit = (event) => {
+  handleRegister = (event) => {
     event.preventDefault();
 
     let errors = this.validateForm();
@@ -67,7 +67,7 @@ class LoginForm extends Component {
     }
 
     const account = this.state.account;
-    console.log("Credentials submitted", account);
+    console.log("New account submitted", account);
   };
 
   validateForm = () => {
@@ -85,4 +85,4 @@ class LoginForm extends Component {
   };
 }
 
-export default LoginForm;
+export default RegisterForm;
