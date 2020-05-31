@@ -1,6 +1,6 @@
 import React, { Component } from "react";
 import { Form, Button, Col } from "react-bootstrap";
-import { getMovie } from "../services/fakeMovieService";
+import { getMovie, saveMovie } from "../services/fakeMovieService";
 import { getGenres } from "../services/fakeGenreService";
 
 class MovieForm extends Component {
@@ -39,6 +39,9 @@ class MovieForm extends Component {
               onChange={this.handleChange}
               placeholder="Enter movie title"
             />
+            {this.state.errors.title && (
+              <Form.Text className="text-danger">{this.state.errors.title}</Form.Text>
+            )}
           </Form.Group>
 
           <Form.Row>
@@ -56,6 +59,9 @@ class MovieForm extends Component {
                   </option>
                 ))}
               </Form.Control>
+              {this.state.errors.genreId && (
+                <Form.Text className="text-danger">{this.state.errors.genreId}</Form.Text>
+              )}
             </Form.Group>
             <Form.Group as={Col} md="4" controlId="numberInStock">
               <Form.Label>In Stock</Form.Label>
@@ -64,8 +70,10 @@ class MovieForm extends Component {
                 name="numberInStock"
                 value={this.state.movie.numberInStock}
                 onChange={this.handleChange}
-                // placeholder="Enter movie title"
               />
+              {this.state.errors.numberInStock && (
+                <Form.Text className="text-danger">{this.state.errors.numberInStock}</Form.Text>
+              )}
             </Form.Group>
             <Form.Group as={Col} md="4" controlId="dailyRentalRate">
               <Form.Label>Rate</Form.Label>
@@ -75,6 +83,9 @@ class MovieForm extends Component {
                 onChange={this.handleChange}
                 placeholder="Enter daily rental rate"
               />
+              {this.state.errors.dailyRentalRate && (
+                <Form.Text className="text-danger">{this.state.errors.dailyRentalRate}</Form.Text>
+              )}
             </Form.Group>
           </Form.Row>
 
@@ -97,13 +108,45 @@ class MovieForm extends Component {
   handleSubmit = (event) => {
     event.preventDefault();
 
-    console.log("Movie saved", this.state.movie);
+    const errors = this.validateForm();
+    if (errors) {
+      console.log("Errors", errors);
+    } else {
+      const movie = this.state.movie;
+      saveMovie(movie);
+      console.log("Movie saved", movie);
+    }
+
+    this.props.history.push("/movies");
   };
 
   handleChange = (event) => {
     const movie = this.state.movie;
     movie[event.currentTarget.name] = event.currentTarget.value;
     this.setState({ movie });
+  };
+
+  validateForm = () => {
+    const errors = {};
+    const movie = this.state.movie;
+
+    if (movie.title.trim() === "") errors.title = "Title is required";
+    if (movie.genreId === "") errors.genreId = "Genre is required";
+    if (movie.numberInStock === "") errors.numberInStock = "In Stock is required";
+    if (movie.numberInStock < 0 || movie.numberInStock > 100)
+      errors.numberInStock = "Must be from 0 to 100";
+    if (movie.dailyRentalRate === "") errors.dailyRentalRate = "Rate is required";
+    if (!movie.dailyRentalRate.match(/^\d{0,2}(?:\.\d{0,2}){0,1}$/))
+      errors.dailyRentalRate = "Invalid format";
+    if (movie.dailyRentalRate < 0 || movie.dailyRentalRate > 10)
+      errors.dailyRentalRate = "Must be from 0 to 10";
+
+    this.setState({ errors });
+    if (Object.keys(errors).length === 0) {
+      return null;
+    } else {
+      return errors;
+    }
   };
 }
 
