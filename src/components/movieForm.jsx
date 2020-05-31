@@ -7,7 +7,7 @@ class MovieForm extends Component {
   constructor(props) {
     super(props);
     this.state = {
-      movie: { id: "", title: "", genreId: "", numberInStock: "", dailyRentalRate: "" },
+      movie: { _id: "", title: "", genreId: "", numberInStock: "", dailyRentalRate: "" },
       genres: [],
       errors: {},
     };
@@ -29,7 +29,7 @@ class MovieForm extends Component {
   render() {
     return (
       <React.Fragment>
-        <h1>{this.state.movie.id === "" ? "New movie" : "Edit Movie "}</h1>
+        <h1>{this.state.movie._id === "" ? "New movie" : "Edit Movie "}</h1>
         <Form onSubmit={this.handleSubmit}>
           <Form.Group controlId="title">
             <Form.Label>Title</Form.Label>
@@ -97,7 +97,7 @@ class MovieForm extends Component {
 
   mapToModelView = (movie) => {
     return {
-      id: movie._id,
+      _id: movie._id,
       title: movie.title,
       genreId: movie.genre._id,
       numberInStock: movie.numberInStock,
@@ -111,6 +111,7 @@ class MovieForm extends Component {
     const errors = this.validateForm();
     if (errors) {
       console.log("Errors", errors);
+      return;
     } else {
       const movie = this.state.movie;
       saveMovie(movie);
@@ -130,15 +131,18 @@ class MovieForm extends Component {
     const errors = {};
     const movie = this.state.movie;
 
-    if (movie.title.trim() === "") errors.title = "Title is required";
+    if (movie.title === "") errors.title = "Title is required";
     if (movie.genreId === "") errors.genreId = "Genre is required";
-    if (movie.numberInStock === "") errors.numberInStock = "In Stock is required";
-    if (movie.numberInStock < 0 || movie.numberInStock > 100)
-      errors.numberInStock = "Must be from 0 to 100";
-    if (movie.dailyRentalRate === "") errors.dailyRentalRate = "Rate is required";
-    if (!movie.dailyRentalRate.match(/^\d{0,2}(?:\.\d{0,2}){0,1}$/))
-      errors.dailyRentalRate = "Invalid format";
-    if (movie.dailyRentalRate < 0 || movie.dailyRentalRate > 10)
+
+    const numberInStock = movie.numberInStock;
+    if (numberInStock === "") errors.numberInStock = "In Stock is required";
+    if (!Number.isInteger(numberInStock)) errors.numberInStock = "Must be a number";
+    if (numberInStock < 0 || numberInStock > 100) errors.numberInStock = "Must be from 0 to 100";
+
+    const dailyRentalRate = movie.dailyRentalRate;
+    if (dailyRentalRate === "") errors.dailyRentalRate = "Rate is required";
+    if (Number.isNaN(parseFloat(dailyRentalRate))) errors.dailyRentalRate = "Must be a number";
+    if (dailyRentalRate < 0 || dailyRentalRate > 10)
       errors.dailyRentalRate = "Must be from 0 to 10";
 
     this.setState({ errors });
