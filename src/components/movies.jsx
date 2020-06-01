@@ -1,16 +1,19 @@
 import React, { Component } from "react";
 import { Link } from "react-router-dom";
+import { toast } from "react-toastify";
+
 import MoviesTable from "./moviesTable";
 import Pagination from "./common/pagination";
 import GroupList from "./common/groupList";
 import paginate from "../utils/paginate";
-import { getMovies } from "../services/fakeMovieService";
-import { getGenres } from "../services/fakeGenreService";
+import { getMovies, deleteMovie } from "../services/movieService";
+import { getGenres } from "../services/genreService";
 import _ from "lodash";
 import SearchBox from "./common/searchBox";
 
 class Movies extends Component {
   state = {
+    isLoaded: false,
     genres: [],
     movies: {},
     searchQuery: "",
@@ -20,12 +23,19 @@ class Movies extends Component {
     sortBy: { column: "title", order: "asc" },
   };
 
-  componentDidMount() {
-    const genres = [{ _id: "", name: "All Genres" }, ...getGenres()];
-    this.setState({ movies: getMovies(), genres });
+  async componentDidMount() {
+    const { data } = await getGenres();
+    const genres = [{ _id: "", name: "All Genres" }, ...data];
+
+    const { data: movies } = await getMovies();
+
+    this.setState({ movies, genres });
+    this.setState({ isLoaded: true });
   }
 
   render() {
+    if (!this.state.isLoaded) return <p>Loading...</p>;
+
     const totalMovies = this.state.movies.length;
     if (totalMovies === 0) return <p>There are no movies in database</p>;
 
@@ -87,10 +97,20 @@ class Movies extends Component {
     );
   }
 
-  handleDelete = (movieId) => {
-    console.log("Deleting movie", movieId);
-    const newMovies = this.state.movies.filter((m) => m._id !== movieId);
+  handleDelete = async (movieId) => {
+    const originalMovies = this.state.movies;
+    const newMovies = originalMovies.filter((m) => m._id !== movieId);
     this.setState({ movies: newMovies });
+
+    try {
+      await deleteMovie(movieId);
+    } catch (ex) {
+      this.setState({ movies: originalMovies });
+
+      if (ex.response && ex.response.status === 404) {
+        toast.error("This movie was previosuly deleted");
+      }
+    }
   };
 
   handleLike = (movie) => {
