@@ -1,15 +1,16 @@
 import React, { Component } from "react";
 import { Link } from "react-router-dom";
 import { toast } from "react-toastify";
+import _ from "lodash";
 
 import MoviesTable from "./moviesTable";
 import Pagination from "./common/pagination";
 import GroupList from "./common/groupList";
+import SearchBox from "./common/searchBox";
+
 import paginate from "../utils/paginate";
 import { getMovies, deleteMovie } from "../services/movieService";
 import { getGenres } from "../services/genreService";
-import _ from "lodash";
-import SearchBox from "./common/searchBox";
 
 class Movies extends Component {
   state = {
@@ -29,8 +30,7 @@ class Movies extends Component {
 
     const { data: movies } = await getMovies();
 
-    this.setState({ movies, genres });
-    this.setState({ isLoaded: true });
+    this.setState({ movies, genres, isLoaded: true });
   }
 
   render() {

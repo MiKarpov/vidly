@@ -1,8 +1,6 @@
 import React, { Component } from "react";
 import { Form, Button, Col } from "react-bootstrap";
-// import { toast } from "react-toastify";
 
-import logger from "../services/logService";
 import { getMovie, saveMovie } from "../services/movieService";
 import { getGenres } from "../services/genreService";
 
@@ -41,7 +39,6 @@ class MovieForm extends Component {
               <Form.Text className="text-danger">{this.state.errors.title}</Form.Text>
             )}
           </Form.Group>
-
           <Form.Row>
             <Form.Group as={Col} md="4" controlId="genreId">
               <Form.Label>Genre</Form.Label>
@@ -99,13 +96,13 @@ class MovieForm extends Component {
   }
 
   async populateMovie() {
-    try {
-      const movieId = this.props.match.params.id;
-      if (movieId === "new") {
-        this.setState({ isLoaded: true });
-        return;
-      }
+    const movieId = this.props.match.params.id;
+    if (movieId === "new") {
+      this.setState({ isLoaded: true });
+      return;
+    }
 
+    try {
       const { data: movie } = await getMovie(movieId);
       this.setState({ movie: this.mapToModelView(movie), isLoaded: true });
     } catch (ex) {
@@ -132,15 +129,11 @@ class MovieForm extends Component {
     if (errors) {
       console.log("Errors", errors);
       return;
-    } else {
-      const movie = this.state.movie;
-      try {
-        await saveMovie(movie);
-        this.props.history.push("/movies");
-      } catch (ex) {
-        logger.error(ex);
-      }
     }
+
+    const movie = this.state.movie;
+    await saveMovie(movie);
+    this.props.history.push("/movies");
   };
 
   handleChange = (event) => {

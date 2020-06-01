@@ -20,18 +20,14 @@ export function deleteMovie(movieId) {
 }
 
 export function saveMovie(movie) {
+  const body = { ...movie };
+  delete body._id;
+
   if (movie._id) {
-    logger.log2("Updating movie", movie);
-
-    const body = { ...movie };
-    delete body._id;
-
+    logger.log("Updating movie with id = ", movie._id);
     return httpService.put(apiEndpoint + "/" + movie._id, body);
   } else {
-    const body = { ...movie };
-    delete body._id;
-    logger.log2("Adding new movie", body);
-
+    logger.log("Adding new movie");
     return httpService.post(apiEndpoint, body);
   }
 }
