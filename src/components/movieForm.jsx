@@ -136,12 +136,12 @@ class MovieForm extends Component {
 
     const numberInStock = movie.numberInStock;
     if (numberInStock === "") errors.numberInStock = "In Stock is required";
-    if (!Number.isInteger(numberInStock)) errors.numberInStock = "Must be a number";
+    if (isNaN(numberInStock)) errors.numberInStock = "Must be a number";
     if (numberInStock < 0 || numberInStock > 100) errors.numberInStock = "Must be from 0 to 100";
 
     const dailyRentalRate = movie.dailyRentalRate;
     if (dailyRentalRate === "") errors.dailyRentalRate = "Rate is required";
-    if (Number.isNaN(parseFloat(dailyRentalRate))) errors.dailyRentalRate = "Must be a number";
+    if (isNaN(parseFloat(dailyRentalRate))) errors.dailyRentalRate = "Must be a number";
     if (dailyRentalRate < 0 || dailyRentalRate > 10)
       errors.dailyRentalRate = "Must be from 0 to 10";
 
