@@ -1,32 +1,32 @@
-import React, { Component } from "react";
-import { Link } from "react-router-dom";
-import { toast } from "react-toastify";
-import _ from "lodash";
+import React, { Component } from 'react';
+import { Link } from 'react-router-dom';
+import { toast } from 'react-toastify';
+import _ from 'lodash';
 
-import MoviesTable from "./moviesTable";
-import Pagination from "./common/pagination";
-import GroupList from "./common/groupList";
-import SearchBox from "./common/searchBox";
+import MoviesTable from './moviesTable';
+import Pagination from './common/pagination';
+import GroupList from './common/groupList';
+import SearchBox from './common/searchBox';
 
-import paginate from "../utils/paginate";
-import { getMovies, deleteMovie } from "../services/movieService";
-import { getGenres } from "../services/genreService";
+import paginate from '../utils/paginate';
+import { getMovies, deleteMovie } from '../services/movieService';
+import { getGenres } from '../services/genreService';
 
 class Movies extends Component {
   state = {
     isLoaded: false,
     genres: [],
     movies: {},
-    searchQuery: "",
+    searchQuery: '',
     pageSize: 4,
     currentPage: 1,
     selectedGenre: null,
-    sortBy: { column: "title", order: "asc" },
+    sortBy: { column: 'title', order: 'asc' },
   };
 
   async componentDidMount() {
     const { data } = await getGenres();
-    const genres = [{ _id: "", name: "All Genres" }, ...data];
+    const genres = [{ _id: '', name: 'All Genres' }, ...data];
 
     const { data: movies } = await getMovies();
 
@@ -50,8 +50,8 @@ class Movies extends Component {
       filteredMovies = this.state.movies.filter((m) =>
         m.title.toLowerCase().startsWith(this.state.searchQuery.toLowerCase())
       );
-    } else if (selectedGenre && selectedGenre._id) {
-      filteredMovies = this.state.movies.filter((m) => m.genre._id === selectedGenre._id);
+    } else if (selectedGenre && selectedGenre.id) {
+      filteredMovies = this.state.movies.filter((m) => m.genre.id === selectedGenre.id);
     }
 
     // Sort movies
@@ -62,18 +62,18 @@ class Movies extends Component {
     const totalMoviesShown = sortedMovies.length;
 
     return (
-      <div className="row">
-        <div className="col-3">
+      <div className='row'>
+        <div className='col-3'>
           <GroupList
             items={genres}
-            textProperty="name"
-            valueProperty="_id"
+            textProperty='name'
+            valueProperty='id'
             selectedItem={this.state.selectedGenre}
             onItemSelect={this.handleGenreSelect}
           />
         </div>
-        <div className="col">
-          <Link to="/movies/new" className="btn btn-primary" style={{ marginBottom: 20 }}>
+        <div className='col'>
+          <Link to='/movies/new' className='btn btn-primary' style={{ marginBottom: 20 }}>
             Add new
           </Link>
           <p>
@@ -99,7 +99,7 @@ class Movies extends Component {
 
   handleDelete = async (movieId) => {
     const originalMovies = this.state.movies;
-    const newMovies = originalMovies.filter((m) => m._id !== movieId);
+    const newMovies = originalMovies.filter((m) => m.id !== movieId);
     this.setState({ movies: newMovies });
 
     try {
@@ -108,13 +108,13 @@ class Movies extends Component {
       this.setState({ movies: originalMovies });
 
       if (ex.response && ex.response.status === 404) {
-        toast.error("This movie was previosuly deleted");
+        toast.error('This movie was previosuly deleted');
       }
     }
   };
 
   handleLike = (movie) => {
-    console.log("Toggling like", movie);
+    console.log('Toggling like', movie);
 
     let newMovies = [...this.state.movies];
     const index = newMovies.indexOf(movie);
@@ -123,29 +123,29 @@ class Movies extends Component {
   };
 
   handlePageChange = (page) => {
-    console.log("Changing page", page);
+    console.log('Changing page', page);
     this.setState({ currentPage: page });
   };
 
   handleGenreSelect = (genre) => {
-    console.log("Selected genre", genre);
-    this.setState({ selectedGenre: genre, currentPage: 1, searchQuery: "" });
+    console.log('Selected genre', genre);
+    this.setState({ selectedGenre: genre, currentPage: 1, searchQuery: '' });
   };
 
   handleSearch = (query) => {
-    console.log("Searching movie", query);
+    console.log('Searching movie', query);
     this.setState({ searchQuery: query, selectedGenre: null, currentPage: 1 });
   };
 
   handleSort = (column) => {
     const sortBy = { ...this.state.sortBy };
     if (sortBy.column === column) {
-      console.log("Togglng sort by", column);
-      sortBy.order = sortBy.order === "asc" ? "desc" : "asc";
+      console.log('Togglng sort by', column);
+      sortBy.order = sortBy.order === 'asc' ? 'desc' : 'asc';
     } else {
-      console.log("Sorting in ascending order by", column);
+      console.log('Sorting in ascending order by', column);
       sortBy.column = column;
-      sortBy.order = "asc";
+      sortBy.order = 'asc';
     }
 
     this.setState({ sortBy });

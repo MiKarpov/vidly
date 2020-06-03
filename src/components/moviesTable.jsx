@@ -27,9 +27,9 @@ const MoviesTable = (props) => {
       </thead>
       <tbody>
         {movies.map((movie) => (
-          <tr key={movie._id}>
+          <tr key={movie.id}>
             <td>
-              <Link to={`/movies/${movie._id}`}>{movie.title}</Link>
+              <Link to={`/movies/${movie.id}`}>{movie.title}</Link>
             </td>
             <td>{movie.genre.name}</td>
             <td>{movie.numberInStock}</td>
@@ -38,7 +38,7 @@ const MoviesTable = (props) => {
               <Like liked={movie.liked} onClick={() => onLike(movie)} />
             </td>
             <td>
-              <button onClick={() => onDelete(movie._id)} className='btn btn-danger btn-sm'>
+              <button onClick={() => onDelete(movie.id)} className='btn btn-danger btn-sm'>
                 Delete
               </button>
             </td>
