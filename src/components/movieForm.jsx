@@ -3,6 +3,7 @@ import { Form, Button, Col } from 'react-bootstrap';
 
 import { getMovie, saveMovie } from '../services/movieService';
 import { getGenres } from '../services/genreService';
+import logger from '../services/logService';
 
 class MovieForm extends Component {
   constructor(props) {
