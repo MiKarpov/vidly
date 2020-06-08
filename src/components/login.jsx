@@ -1,12 +1,14 @@
 import React, { Component } from "react";
-import { Form, Button } from "react-bootstrap";
+import { Form, Button, Alert } from "react-bootstrap";
+import authService from "../services/authService";
 
 class LoginForm extends Component {
   constructor(props) {
     super(props);
     this.state = {
-      account: { username: "", password: "" },
+      account: { email: "", password: "" },
       errors: {},
+      errMsg: "",
     };
   }
 
@@ -14,33 +16,38 @@ class LoginForm extends Component {
     return (
       <React.Fragment>
         <h1>Login</h1>
+
+        {this.state.errMsg && <Alert variant='danger'>{this.state.errMsg}</Alert>}
+
         <Form onSubmit={this.handleSubmit}>
-          <Form.Group controlId="username">
-            <Form.Label>Username</Form.Label>
+          <Form.Group controlId='username'>
+            <Form.Label>Email</Form.Label>
             <Form.Control
-              name="username"
-              value={this.state.account.username}
+              name='email'
+              value={this.state.account.email}
               onChange={this.handleChange}
-              placeholder="Enter username"
+              placeholder='Enter email'
             />
-            {this.state.errors.username && (
-              <Form.Text className="text-danger">{this.state.errors.username}</Form.Text>
+            {this.state.errors.email && (
+              <Form.Text className='text-danger'>{this.state.errors.email}</Form.Text>
             )}
           </Form.Group>
-          <Form.Group controlId="password">
+
+          <Form.Group controlId='password'>
             <Form.Label>Password</Form.Label>
             <Form.Control
-              type="password"
-              name="password"
+              type='password'
+              name='password'
               value={this.state.account.password}
               onChange={this.handleChange}
-              placeholder="Enter password"
+              placeholder='Enter password'
             />
             {this.state.errors.password && (
-              <Form.Text className="text-danger">{this.state.errors.password}</Form.Text>
+              <Form.Text className='text-danger'>{this.state.errors.password}</Form.Text>
             )}
           </Form.Group>
-          <Button type="submit">Register</Button>
+
+          <Button type='submit'>Login</Button>
         </Form>
       </React.Fragment>
     );
@@ -52,7 +59,7 @@ class LoginForm extends Component {
     this.setState({ account });
   };
 
-  handleSubmit = (event) => {
+  handleSubmit = async (event) => {
     event.preventDefault();
 
     let errors = this.validateForm();
@@ -66,16 +73,24 @@ class LoginForm extends Component {
       this.setState({ errors });
     }
 
-    const account = this.state.account;
-    console.log("Credentials submitted", account);
+    try {
+      const { email, password } = this.state.account;
+      await authService.login(email, password);
+      window.location = "/";
+    } catch (ex) {
+      if (ex.response && ex.response.status === 400) {
+        const errMsg = ex.response.data.message;
+        this.setState({ errMsg });
+      }
+    }
   };
 
   validateForm = () => {
     const account = this.state.account;
     const errors = {};
 
-    if (account.username.trim() === "") errors.username = "Username is required";
-    if (account.password.trim() === "") errors.password = "Password is required";
+    if (account.email === "") errors.email = "Email is required";
+    if (account.password === "") errors.password = "Password is required";
 
     if (Object.keys(errors).length === 0) {
       return null;
