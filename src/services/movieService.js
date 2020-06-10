@@ -1,12 +1,22 @@
 import httpService from './httpService';
 import logger from './logService';
 import { apiUrl } from '../config.json';
+import authServcie from './authService';
 
 const apiEndpoint = apiUrl + '/movies';
 
 export function getMovies() {
   logger.log('Fetching movies...');
-  return httpService.get(apiEndpoint);
+  return httpService.get(apiEndpoint, config());
+}
+
+function config() {
+  const jwt = authServcie.getJwt();
+  if (jwt) {
+    return { headers: { Authorization: `Bearer ${jwt}` } };
+  } else {
+    return null;
+  }
 }
 
 export function getMovie(movieId) {

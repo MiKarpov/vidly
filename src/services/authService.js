@@ -29,20 +29,27 @@ export async function login(email, password) {
 
 export function logout() {
   localStorage.removeItem('jwt');
-  localStorage.removeItem('user');
+  localStorage.removeItem('email');
 }
 
 export function getJwt() {
-  return localStorage.getItem('token');
+  return localStorage.getItem('jwt');
 }
 
 export function getUser() {
-  return localStorage.getItem('user');
+  return localStorage.getItem('email');
 }
 
 function saveJwtAndUser(data) {
-  localStorage.setItem('token', data.jwt);
-  localStorage.setItem('user', data.email);
+  localStorage.setItem('jwt', data.jwt);
+  localStorage.setItem('email', data.email);
+}
+
+function getAuthorizationHeader() {
+  const jwt = localStorage.getItem('jwt');
+  if (!jwt) return null;
+
+  return `Bearer ${jwt}`;
 }
 
 export default {
@@ -51,4 +58,5 @@ export default {
   logout,
   getJwt,
   getUser,
+  getAuthorizationHeader,
 };

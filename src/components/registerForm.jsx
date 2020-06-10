@@ -94,9 +94,16 @@ class RegisterForm extends Component {
       await authService.register(email, password, matchingPassword);
       window.location = '/';
     } catch (ex) {
-      if (ex.response && ex.response.status === 400) {
-        const errMsg = ex.response.data.message;
-        this.setState({ errMsg });
+      const data = ex.response.data;
+      if (ex.response && ex.response.status === 400 && data) {
+        if (data.errors) {
+          const errors = data.errors;
+          this.setState({ errors });
+        }
+        if (data.message) {
+          const errMsg = data.message;
+          this.setState({ errMsg });
+        }
       }
     }
   };
@@ -107,6 +114,7 @@ class RegisterForm extends Component {
 
     if (email === '') errors.email = 'Email is required';
     if (password === '') errors.password = 'Password is required';
+    if (password.length < 8) errors.password = 'Password must be at least 8 characters long';
     if (matchingPassword === '') errors.matchingPassword = 'Password is required';
     if (matchingPassword !== password) errors.matchingPassword = "Passwords don't match";
 
